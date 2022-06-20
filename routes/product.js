@@ -5,12 +5,14 @@ import {
   editProduct,
   getProduct,
   getUserProducts,
+  purchaseProduct,
 } from '../controllers/product.js';
 
 const router = exress.Router();
 
-router.get('/user/:userId', getUserProducts);
 router.post('/', createProduct);
+router.get('/user/:userId', getUserProducts);
+router.patch('/purchase/:productId', purchaseProduct);
 router
   .route('/:productId')
   .get(getProduct)

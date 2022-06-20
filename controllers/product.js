@@ -1,4 +1,5 @@
 import Product from '../models/Product.js';
+import Purchase from '../models/Purchase.js';
 import APIError from '../errors/APIErrors.js';
 import User from '../models/User.js';
 
@@ -96,10 +97,52 @@ export const deleteProduct = async (req, res) => {
   res.status(200).json({ message: 'Product Deleted' });
 };
 
+// Purchase product
+export const purchaseProduct = async (req, res) => {
+  const { productId } = req.params;
+  const { quantity } = req.query;
+
+  // No quantity
+  if (!quantity)
+    throw APIError.badRequest('Please specify quantity of product purchased');
+
+  // Product info
+  const product = await Product.findById(productId);
+
+  // No product found
+  if (!product)
+    throw APIError.notFound(`Product with id ${productId} does not exist`);
+
+  // Current user
+  const currUser = await User.findById(req.user.id);
+
+  // Check if user can access this route
+  verifyAccess(currUser.role, product.owner, req.user.id);
+
+  // Purchase info
+  const purchaseInfo = {
+    product: productId,
+    stock: product.stock,
+    quantity,
+    price: product.price,
+  };
+
+  // Save purchase info to db
+  await Purchase.create(purchaseInfo);
+
+  // Update product quantity
+  product.stock -= quantity;
+
+  // Save updated product to db
+  await product.save();
+
+  res.json({ message: 'Product purchase successful' });
+};
+
 // ## utils
 
 // Verify if the current user is the owner or admin
-const verifyAccess = (role, userId, currId) => {
+export const verifyAccess = (role, userId, currId) => {
   if (role !== 'admin' && userId.toString() !== currId)
     throw APIError.forbiddden('Only the owner can access this route');
 };
