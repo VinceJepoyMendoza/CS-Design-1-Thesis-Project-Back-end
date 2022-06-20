@@ -24,6 +24,12 @@ export const loginUser = async (req, res) => {
   if (!email || !password)
     throw APIError.badRequest('Please provide email and password');
 
+  // Check if user exist
+  const userExist = await User.exists({ email });
+
+  if (!userExist)
+    throw APIError.notFound(`User with email ${email} does not exist`);
+
   // Retrieving email
   const user = await User.findOne({ email });
   if (!user) throw APIError.badRequest('Email and password does not match');
@@ -34,8 +40,6 @@ export const loginUser = async (req, res) => {
 
   // Generate token
   const token = user.createToken();
-  // Set header token
-  // req.headers.authorization = token
 
   res.status(200).json({ token });
 };

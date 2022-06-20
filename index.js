@@ -13,6 +13,7 @@ import authenticate from './middleware/authenticate.js';
 // Routes import
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/user.js';
+import productRoutes from './routes/product.js';
 
 dotenv.config();
 const app = express();
@@ -34,6 +35,7 @@ app.use('/auth', authRoutes);
 app.use(authenticate);
 
 app.use('/user', userRoutes);
+app.use('/products', productRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
