@@ -6,6 +6,10 @@ const PurchaseSchema = mongoose.Schema(
       type: mongoose.SchemaTypes.ObjectId,
       ref: 'Product',
     },
+    owner: {
+      type: mongoose.SchemaTypes.ObjectId,
+      ref: 'User',
+    },
     stock: Number,
     quantity: Number,
     price: Number,

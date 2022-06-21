@@ -23,9 +23,10 @@ export const getProductPurchases = async (req, res) => {
   // Purchases
   const purchases = await Purchase.find({ product: productId });
 
-  res.json({ purchases });
+  res.json(purchases);
 };
 
+// Gather data to use in prediction
 export const gatherDataToPredict = async (req, res) => {
   const { productId } = req.params;
 
@@ -90,7 +91,7 @@ export const gatherDataToPredict = async (req, res) => {
   });
 
   // Data template
-  const sales = {
+  let sales = {
     week1: {
       sold: 0,
     },
@@ -106,26 +107,6 @@ export const gatherDataToPredict = async (req, res) => {
   };
 
   // tallying total quantity sold per week
-  week1.forEach((purchase) => (sales.week1.sold += purchase.quantity));
-  week2.forEach((purchase) => (sales.week2.sold += purchase.quantity));
-  week3.forEach((purchase) => (sales.week3.sold += purchase.quantity));
-  week4.forEach((purchase) => (sales.week4.sold += purchase.quantity));
-
-  // stock - stock of the first sale of the week
-  sales.week1.stock = week1[0].stock;
-  sales.week2.stock = week2[0].stock;
-  sales.week3.stock = week3[0].stock;
-  sales.week4.stock = week4[0].stock;
-
-  // price - mean value of all the prices
-  let week1Price = week1.map((purchase) => purchase.price);
-  week1Price = [...new Set(week1Price)];
-  let week2Price = week2.map((purchase) => purchase.price);
-  week2Price = [...new Set(week2Price)];
-  let week3Price = week3.map((purchase) => purchase.price);
-  week3Price = [...new Set(week3Price)];
-  let week4Price = week4.map((purchase) => purchase.price);
-  week4Price = [...new Set(week4Price)];
 
   // Get median value of all the prices
   const getWeekPrice = (arr) => {
@@ -133,11 +114,62 @@ export const gatherDataToPredict = async (req, res) => {
     return arr.length % 2 !== 0 ? arr[mid] : (arr[mid - 1] + arr[mid]) / 2;
   };
 
-  // assigning price for every week
-  sales.week1.price = getWeekPrice(week1Price);
-  sales.week2.price = getWeekPrice(week2Price);
-  sales.week3.price = getWeekPrice(week3Price);
-  sales.week4.price = getWeekPrice(week4Price);
+  // Week1
+  if (week1.length) {
+    // Quantity
+    week1.forEach((purchase) => (sales.week1.sold += purchase.quantity));
+    // Price
+    let week1Price = week1.map((purchase) => purchase.price);
+    week1Price = [...new Set(week1Price)];
+    sales.week1.price = getWeekPrice(week1Price);
+    // Stock
+    sales.week1.stock = week1[0].stock;
+  }
+
+  // Week2
+  if (week2.length) {
+    // Quantity
+    week2.forEach((purchase) => (sales.week2.sold += purchase.quantity));
+    // Price
+    let week2Price = week2.map((purchase) => purchase.price);
+    week2Price = [...new Set(week2Price)];
+    sales.week2.price = getWeekPrice(week2Price);
+    // Stock
+    sales.week2.stock = week2[0].stock;
+  }
+
+  // Week3
+  if (week3.length) {
+    // Quantity
+    week3.forEach((purchase) => (sales.week3.sold += purchase.quantity));
+    // Price
+    let week3Price = week3.map((purchase) => purchase.price);
+    week3Price = [...new Set(week3Price)];
+    sales.week3.price = getWeekPrice(week3Price);
+    // Stock
+    sales.week3.stock = week3[0].stock;
+  }
+
+  // Week4
+  if (week4.length) {
+    // Quantity
+    week4.forEach((purchase) => (sales.week4.sold += purchase.quantity));
+    // Price
+    let week4Price = week4.map((purchase) => purchase.price);
+    week4Price = [...new Set(week4Price)];
+    sales.week4.price = getWeekPrice(week4Price);
+    // Stock
+    sales.week4.stock = week4[0].stock;
+  }
+
+  // No sale for the week
+  for (const sale of Object.keys(sales)) {
+    // No week purchase
+    if (!sales[sale].sold) {
+      sales[sale].stock = 0;
+      sales[sale].price = 0;
+    }
+  }
 
   const dataToPredict = {
     name: product.name,
@@ -147,17 +179,85 @@ export const gatherDataToPredict = async (req, res) => {
   res.json(dataToPredict);
 };
 
+// Get owner all purchases
+export const getOwnerPurchases = async (req, res) => {
+  const { userId } = req.params;
+
+  const user = await User.findById(userId);
+
+  const currUser = await User.findById(req.user.id);
+
+  if (!user) throw APIError.notFound(`No user with id ${userId}`);
+
+  // Only allow owner and admin to access this route
+  verifyAccess(currUser.role, userId, req.user.id);
+
+  const purchases = await Purchase.find({ owner: userId }).sort({
+    createdAt: -1,
+  });
+
+  res.json(purchases);
+};
+
 // Get product purchase
 export const getPurchase = async (req, res) => {
-  res.json({ message: 'product purchases' });
+  const { purchaseId } = req.params;
+
+  // Current user
+  const currUser = await User.findById(req.user.id).select('role');
+
+  // Product info
+  const purchase = await Purchase.findById(purchaseId);
+
+  if (!purchase)
+    throw APIError.notFound(`Purchase with id of ${purchaseId} not found`);
+
+  // Only allow owner and admin to access this route
+  verifyAccess(currUser.role, purchase.owner, req.user.id);
+
+  res.json({ purchase });
 };
 
 // Delete product purchase
 export const deletePurchase = async (req, res) => {
-  res.json({ message: 'product purchases' });
+  const { purchaseId } = req.params;
+
+  // Current user
+  const currUser = await User.findById(req.user.id).select('role');
+
+  // Product info
+  const purchase = await Purchase.findById(purchaseId);
+
+  if (!purchase)
+    throw APIError.notFound(`Purchase with id of ${purchaseId} not found`);
+
+  // Only allow owner and admin to access this route
+  verifyAccess(currUser.role, purchase.owner, req.user.id);
+
+  await Purchase.deleteOne({ _id: purchaseId });
+
+  res.json({ message: 'Purchase deleted' });
 };
 
 // Edit product purchase
 export const editPurchase = async (req, res) => {
-  res.json({ message: 'product purchases' });
+  const { purchaseId } = req.params;
+
+  // Current user
+  const currUser = await User.findById(req.user.id).select('role');
+
+  // Product info
+  const purchase = await Purchase.findById(purchaseId);
+
+  if (!purchase)
+    throw APIError.notFound(`Purchase with id of ${purchaseId} not found`);
+
+  // Only allow owner and admin to access this route
+  verifyAccess(currUser.role, purchase.owner, req.user.id);
+
+  await Purchase.findByIdAndUpdate(purchaseId, req.body, {
+    runValidators: true,
+  });
+
+  res.json({ message: 'Purchase updated' });
 };

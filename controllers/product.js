@@ -19,7 +19,7 @@ export const getUserProducts = async (req, res) => {
   // Retrieving products
   const products = await Product.find({ owner: userId });
 
-  res.status(200).json({ length: products.length, products });
+  res.status(200).json(products);
 };
 
 // Get product's info
@@ -38,7 +38,7 @@ export const getProduct = async (req, res) => {
   // Check if user can access this route
   verifyAccess(currUser.role, product.owner, req.user.id);
 
-  res.status(200).json({ product });
+  res.status(200).json(product);
 };
 
 // Create product

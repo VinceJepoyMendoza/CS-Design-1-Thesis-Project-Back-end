@@ -3,6 +3,7 @@ import {
   deletePurchase,
   editPurchase,
   gatherDataToPredict,
+  getOwnerPurchases,
   getProductPurchases,
   getPurchase,
 } from '../controllers/purchase.js';
@@ -10,6 +11,7 @@ import {
 const router = express.Router();
 
 router.get('/product/:productId', getProductPurchases);
+router.get('/user/:userId', getOwnerPurchases);
 router.get('/product/gather-data/:productId', gatherDataToPredict);
 router
   .route('/single/:purchaseId')
