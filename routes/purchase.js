@@ -1,5 +1,6 @@
 import express from 'express';
 import {
+  createDataToPredict,
   deletePurchase,
   editPurchase,
   gatherDataToPredict,
@@ -12,7 +13,8 @@ const router = express.Router();
 
 router.get('/product/:productId', getProductPurchases);
 router.get('/user/:userId', getOwnerPurchases);
-router.get('/product/gather-data/:productId', gatherDataToPredict);
+router.get('/product/predict/gather-data/:productId', gatherDataToPredict);
+router.post('/product/predict/create-data/:productId', createDataToPredict);
 router
   .route('/single/:purchaseId')
   .get(getPurchase)

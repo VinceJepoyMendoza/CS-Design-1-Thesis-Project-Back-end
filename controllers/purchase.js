@@ -261,3 +261,45 @@ export const editPurchase = async (req, res) => {
 
   res.json({ message: 'Purchase updated' });
 };
+
+// Create whole month of sales to predict
+export const createDataToPredict = async (req, res) => {
+  const { productId } = req.params;
+
+  // Current user
+  const currUser = await User.findById(req.user.id).select('role');
+
+  // Product info
+  const product = await Product.findById(productId);
+
+  if (!product)
+    throw APIError.notFound(`Purchase with id of ${productId} not found`);
+
+  // Only allow owner and admin to access this route
+  verifyAccess(currUser.role, product.owner, req.user.id);
+
+  const sales = req.body.sales;
+
+  if (!sales.week1 || !sales.week2 || !sales.week3 || !sales.week4)
+    throw APIError.badRequest('Please specify all 4 weeks sales');
+
+  const getWeekData = (obj) => {
+    return {
+      sold: obj.sold,
+      stock: obj.stock,
+      price: obj.price,
+    };
+  };
+
+  const dataToPredict = {
+    name: product.name,
+    sales: {
+      week1: getWeekData(sales.week1),
+      week2: getWeekData(sales.week2),
+      week3: getWeekData(sales.week3),
+      week4: getWeekData(sales.week4),
+    },
+  };
+
+  res.json(dataToPredict);
+};
