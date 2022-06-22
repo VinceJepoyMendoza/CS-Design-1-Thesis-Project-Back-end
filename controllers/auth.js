@@ -12,7 +12,9 @@ export const registerUser = async (req, res, next) => {
     // Save user to db
     await User.create(req.body);
 
-    res.status(201).json({ message: 'User Created' });
+    res
+      .status(201)
+      .json({ message: 'Register Success, You can login your account now' });
   } catch (error) {
     next(error);
   }
