@@ -73,6 +73,8 @@ export const deleteUser = async (req, res) => {
 // Update user
 export const updateUser = async (req, res) => {
   const { userId } = req.params;
+  const { confirmPassword } = req.body;
+  console.log(confirmPassword);
 
   if (!Object.keys(req.body).length)
     throw APIError.badRequest('Please provide values to be updated');
@@ -87,6 +89,13 @@ export const updateUser = async (req, res) => {
 
   // No user found
   if (!user) throw APIError.notFound('User not found');
+
+  if (!confirmPassword)
+    throw APIError.badRequest('Please provide password confirmation');
+
+  // Verifying password
+  const isVerified = await user.comparePassword(req.body.confirmPassword);
+  if (!isVerified) throw APIError.badRequest('Incorrect password confirmation');
 
   // Update user
   await User.findByIdAndUpdate(userId, req.body, {
