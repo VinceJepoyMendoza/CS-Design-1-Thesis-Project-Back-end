@@ -1,4 +1,6 @@
 import APIError from '../errors/APIErrors.js';
+import Product from '../models/Product.js';
+import Purchase from '../models/Purchase.js';
 import User from '../models/User.js';
 
 // Get all user
@@ -52,10 +54,11 @@ export const getUserById = async (req, res) => {
 // Delete user
 export const deleteUser = async (req, res) => {
   const { userId } = req.params;
+  const { confirmPassword } = req.body;
 
   const user = await User.findById(userId);
 
-  const currUser = await User.findById(req.user.id).select('role');
+  const currUser = await User.findById(req.user.id);
 
   // Only allow owner and admin to access this route
   if (currUser.role !== 'admin' && userId !== req.user.id)
@@ -64,8 +67,31 @@ export const deleteUser = async (req, res) => {
   // No user found
   if (!user) throw APIError.notFound('User not found');
 
+  // Require password for non admins
+  if (currUser.role !== 'admin') {
+    if (!confirmPassword)
+      throw APIError.notFound('Password confirmation not found');
+    const isVerified = await user.comparePassword(confirmPassword);
+    if (!isVerified)
+      throw APIError.forbiddden('Incorrect password confirmation');
+  }
+  // Require password for admins
+  if (currUser.role === 'admin') {
+    if (!confirmPassword)
+      throw APIError.notFound('Password confirmation not found');
+    const isVerified = await currUser.comparePassword(confirmPassword);
+    if (!isVerified)
+      throw APIError.forbiddden('Incorrect password confirmation');
+  }
+
   // Delete user
   await User.findByIdAndDelete(user);
+
+  // Delete user's products
+  await Product.deleteMany({ owner: user._id });
+
+  // Delete user's purchases
+  await Purchase.deleteMany({ owner: user._id });
 
   res.status(200).json({ message: 'User deleted' });
 };
@@ -74,7 +100,6 @@ export const deleteUser = async (req, res) => {
 export const updateUser = async (req, res) => {
   const { userId } = req.params;
   const { confirmPassword } = req.body;
-  console.log(confirmPassword);
 
   if (!Object.keys(req.body).length)
     throw APIError.badRequest('Please provide values to be updated');

@@ -17,6 +17,9 @@ export const getProductPurchases = async (req, res) => {
     select: 'role',
   });
 
+  if (!product)
+    throw APIError.notFound(`product with id of ${productId} not found`);
+
   // Only allow owner and admin to access this route
   verifyAccess(currUser.role, product.owner._id, req.user.id);
 
@@ -184,6 +187,8 @@ export const getOwnerPurchases = async (req, res) => {
   const { userId } = req.params;
 
   const user = await User.findById(userId);
+
+  if (!user) throw APIError.notFound(`User with id of ${userId} not found`);
 
   const currUser = await User.findById(req.user.id);
 

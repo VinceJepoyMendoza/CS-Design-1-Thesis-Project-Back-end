@@ -7,13 +7,15 @@ import User from '../models/User.js';
 export const getUserProducts = async (req, res) => {
   const { userId } = req.params;
 
+  const user = await User.findById(userId);
+
   // Current user
   const currUser = await User.findById(req.user.id);
 
   // Check if user can access this route
   verifyAccess(currUser.role, userId, req.user.id);
 
-  if (!currUser)
+  if (!user)
     throw APIError.notFound(`User with id of ${userId} does not exist`);
 
   // Retrieving products
