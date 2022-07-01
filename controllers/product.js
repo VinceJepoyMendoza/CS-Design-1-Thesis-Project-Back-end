@@ -19,7 +19,7 @@ export const getUserProducts = async (req, res) => {
     throw APIError.notFound(`User with id of ${userId} does not exist`);
 
   // Retrieving products
-  const products = await Product.find({ owner: userId });
+  const products = await Product.find({ owner: userId }).sort({ name: 1 });
 
   res.status(200).json(products);
 };

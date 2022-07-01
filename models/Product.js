@@ -13,6 +13,7 @@ const ProductSchema = mongoose.Schema({
   price: {
     type: Number,
     required: [true, "Please enter product's price"],
+    min: 0,
   },
   stock: {
     type: Number,
@@ -34,11 +35,6 @@ const ProductSchema = mongoose.Schema({
   flavor: {
     type: String,
     trim: true,
-  },
-  description: {
-    type: String,
-    trim: true,
-    maxlength: 300,
   },
 });
 
