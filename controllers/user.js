@@ -124,3 +124,29 @@ export const updateUser = async (req, res) => {
   });
   res.status(201).json({ message: 'User updated' });
 };
+
+export const updateRole = async (req, res) => {
+  const { userId } = req.params;
+  const status = req.body.role;
+
+  const currUser = await User.findById(req.user.id);
+
+  if (!status) throw APIError.notFound('Role not found');
+
+  if (currUser.role !== 'admin')
+    throw APIError.forbiddden('Only admins can access this route');
+
+  const searchUser = await User.findById(userId);
+
+  if (!searchUser) throw APIError.notFound(`User with id ${userId} not found`);
+
+  await User.findByIdAndUpdate(
+    userId,
+    { role: status },
+    {
+      runValidators: true,
+    }
+  );
+
+  res.json({ message: 'User updated' });
+};
