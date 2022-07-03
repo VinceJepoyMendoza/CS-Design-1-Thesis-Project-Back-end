@@ -14,7 +14,7 @@ import authenticate from './middleware/authenticate.js';
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/user.js';
 import productRoutes from './routes/product.js';
-import purchaseRoutes from './routes/purchase.js';
+import predictRoutes from './routes/prediction.js';
 
 dotenv.config();
 const app = express();
@@ -37,7 +37,7 @@ app.use(authenticate);
 
 app.use('/user', userRoutes);
 app.use('/products', productRoutes);
-app.use('/purchase', purchaseRoutes);
+app.use('/predict', predictRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

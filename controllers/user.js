@@ -1,6 +1,5 @@
 import APIError from '../errors/APIErrors.js';
 import Product from '../models/Product.js';
-import Purchase from '../models/Purchase.js';
 import User from '../models/User.js';
 
 // Get all user
@@ -89,9 +88,6 @@ export const deleteUser = async (req, res) => {
 
   // Delete user's products
   await Product.deleteMany({ owner: user._id });
-
-  // Delete user's purchases
-  await Purchase.deleteMany({ owner: user._id });
 
   res.status(200).json({ message: 'User deleted' });
 };

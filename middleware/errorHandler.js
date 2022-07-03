@@ -15,7 +15,8 @@ export default (err, req, res, next) => {
   if (
     err._message === 'User validation failed' ||
     err._message === 'Validation failed' ||
-    err._message === 'Product validation failed'
+    err._message === 'Product validation failed' ||
+    err._message === 'Prediction validation failed'
   ) {
     const inputs = Object.keys(err.errors).map((e) => {
       const errProperties = err.errors[e].properties;
@@ -35,12 +36,6 @@ export default (err, req, res, next) => {
     return res
       .status(400)
       .json({ message: 'Error: Invalid user id or user id does not exist' });
-
-  // Validation error
-  // if (err.name === 'ValidationError') {
-  //   const inputs = Object.keys(err.errors);
-  //   return res.status(400).json({ message: 'Invalid _id format', inputs });
-  // }
 
   res.status(500).json(err);
   // res
