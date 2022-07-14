@@ -33,11 +33,9 @@ app.get('/', (req, res) => {
 app.use('/auth', authRoutes);
 app.use('/predict_sales', predictRoutes);
 
-// Authenticate request first before proceeding
-app.use(authenticate);
-
-app.use('/user', userRoutes);
-app.use('/products', productRoutes);
+// Authenticate user first before proceeding
+app.use('/user', authenticate, userRoutes);
+app.use('/products', authenticate, productRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
