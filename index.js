@@ -31,13 +31,13 @@ app.get('/', (req, res) => {
 
 // Routes
 app.use('/auth', authRoutes);
+app.use('/predict_sales', predictRoutes);
 
 // Authenticate request first before proceeding
 app.use(authenticate);
 
 app.use('/user', userRoutes);
 app.use('/products', productRoutes);
-app.use('/predict_sales', predictRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
