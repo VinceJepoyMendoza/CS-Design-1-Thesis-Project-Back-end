@@ -6,12 +6,6 @@ const PredictionSchema = mongoose.Schema(
       type: mongoose.SchemaTypes.ObjectId,
       ref: 'User',
     },
-    predictAttr: {
-      type: String,
-      enum: ['sales', 'price'],
-      default: 'sales',
-      required: [true, 'Attribute of prediction cannot be empty'],
-    },
     sales: {
       type: [Object],
       required: [true, 'Please provide previous sales to use for prediction'],

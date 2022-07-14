@@ -37,7 +37,7 @@ app.use(authenticate);
 
 app.use('/user', userRoutes);
 app.use('/products', productRoutes);
-app.use('/predict', predictRoutes);
+app.use('/predict_sales', predictRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
