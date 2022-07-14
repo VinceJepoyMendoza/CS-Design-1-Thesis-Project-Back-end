@@ -37,8 +37,8 @@ export default (err, req, res, next) => {
       .status(400)
       .json({ message: 'Error: Invalid user id or user id does not exist' });
 
-  res.status(500).json(err);
-  // res
-  //   .status(500)
-  //   .json({ message: 'Something went wrong, please try again later.' })
+  // res.status(500).json(err);
+  res
+    .status(500)
+    .json({ message: 'Something went wrong, please try again later.' });
 };
