@@ -5,7 +5,7 @@ import { PythonShell } from 'python-shell';
 
 const router = express.Router();
 
-// ######## Use multer to upload files
+// prediction route
 router.post('/create', upload.single('data'), async (req, res) => {
   // File not found
   if (!req.file) throw APIError.notFound('Please pass Sales csv file');
@@ -37,7 +37,7 @@ router.post('/create', upload.single('data'), async (req, res) => {
     const parsedRespond = JSON.parse(resp);
 
     // Delete file after prediction is done
-    deleteFile(fileName);
+    // deleteFile(fileName);
 
     res.status(201).json({ data: parsedRespond });
   });

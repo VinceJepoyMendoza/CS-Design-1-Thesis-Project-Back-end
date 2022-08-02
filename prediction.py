@@ -25,7 +25,7 @@ warnings.filterwarnings('ignore')
 df = pd.read_csv(curr_file)
 
 # Checking if the all columns exist
-if not 'Product' in df or not 'Category' in df or not 'Order_Date' in df or not 'Location' in df or not 'Quantity' in df or not 'Price' in df or not 'Sale' in df:
+if not 'Product' in df or not 'Order_Date' in df or not 'Location' in df or not 'Quantity' in df or not 'Price' in df or not 'Sale' in df:
     output = {
         "success": False,
         "message": 'Please check all names of columns are correct and present'
@@ -57,8 +57,6 @@ df = df.loc[df['Product'] == product_name]
 # drop product & category column
 df = df.drop(['Product', 'Category'], axis=1)
 
-df.head()
-
 
 # In[260]:
 
@@ -83,8 +81,6 @@ if not new_loc in df['Location'].unique():
 
 df['Location'] = le.fit_transform(df['Location'])
 
-df['Location'].unique()
-
 
 # ## Handling missing values
 
@@ -103,9 +99,6 @@ df['Price'] = df['Price'].fillna(df['Price'].mean())
 df['Order_Date'] = df['Order_Date'].fillna(df['Order_Date'].bfill())
 
 
-df.isnull().sum()
-
-
 # In[262]:
 
 
@@ -121,20 +114,13 @@ df['Order_Date'].head()
 # sorting by date
 df = df.sort_values(by='Order_Date', ascending=True)
 
-# df.head()
-df['Order_Date'].unique
-
-
 # In[264]:
-
 
 # converting date to number of days since epoch
 df['Order_Date'] = (df['Order_Date'] - pd.to_datetime('1970-01-01'))
 
 # converting days to int
 df['Order_Date'] = df['Order_Date'].dt.days.astype('int16')
-
-df['Order_Date'].tail()
 
 
 # In[265]:
@@ -149,19 +135,6 @@ df = df.drop(['Sale'], axis=1)
 
 # independent vars
 X = df
-
-
-# In[266]:
-
-
-X.head()
-
-
-# In[267]:
-
-
-Y.head()
-
 
 # In[268]:
 
