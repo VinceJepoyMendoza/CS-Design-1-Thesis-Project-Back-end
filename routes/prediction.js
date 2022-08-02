@@ -30,7 +30,7 @@ router.post('/create', upload.single('data'), async (req, res) => {
       // Delete file
       deleteFile(fileName);
 
-      return res.status(500).json({ success: false, message: err.message });
+      return res.status(500).json({ message: err.message });
     }
 
     // Convert string resp to json
@@ -39,7 +39,7 @@ router.post('/create', upload.single('data'), async (req, res) => {
     // Delete file after prediction is done
     deleteFile(fileName);
 
-    res.status(201).json({ success: true, data: parsedRespond });
+    res.status(201).json({ data: parsedRespond });
   });
 });
 

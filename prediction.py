@@ -5,7 +5,7 @@ import json
 # coding: utf-8
 
 curr_file = 'datas/' + sys.argv[1]
-product_name = sys.argv[2]
+product_name = sys.argv[2].lower()
 new_price = sys.argv[3]
 new_date = sys.argv[4]
 new_loc = sys.argv[5].lower()
@@ -24,13 +24,32 @@ warnings.filterwarnings('ignore')
 
 df = pd.read_csv(curr_file)
 
-df.head()
+# Checking if the all columns exist
+if not 'Product' in df or not 'Category' in df or not 'Order_Date' in df or not 'Location' in df or not 'Quantity' in df or not 'Price' in df or not 'Sale' in df:
+    output = {
+        "success": False,
+        "message": 'Please check all names of columns are correct and present'
+    }
 
+    print(json.dumps(output))
+    exit()
 
 # # Data pre-processing
 
 # In[259]:
 
+df['Product'] = df['Product'].str.lower()
+
+# Return error message if product does not exist
+if not product_name in df['Product'].unique():
+    output = {
+        "success": False,
+        "message": product_name + ' is not part of your products'
+    }
+
+    print(json.dumps(output))
+    exit()
+    
 
 # filter products
 df = df.loc[df['Product'] == product_name]
@@ -50,6 +69,17 @@ from sklearn.preprocessing import LabelEncoder
 le = LabelEncoder()
 
 df['Location'] = df['Location'].str.lower()
+
+
+# Return error message if product does not exist
+if not new_loc in df['Location'].unique():
+    output = {
+        "success": False,
+        "message": new_loc + ' is not part of your locations'
+    }
+
+    print(json.dumps(output))
+    exit()
 
 df['Location'] = le.fit_transform(df['Location'])
 
