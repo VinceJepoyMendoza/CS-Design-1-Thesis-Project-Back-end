@@ -1,9 +1,20 @@
 import APIError from '../errors/APIErrors.js';
+import fs from 'fs';
 
 export default (err, req, res, next) => {
+  // Delete file
+  if (req.file) {
+    fs.unlink(`./datas/${req.file.filename}`, (err) => {
+      if (err) throw err.message;
+    });
+  }
+
   // Custom API errors
   if (err instanceof APIError)
     return res.status(err.statusCode).json({ message: err.message });
+
+  // Invalid file format
+  if (err.storageErrors) return res.status(400).json({ message: err.message });
 
   // DB related
 
@@ -37,8 +48,8 @@ export default (err, req, res, next) => {
       .status(400)
       .json({ message: 'Error: Invalid user id or user id does not exist' });
 
-  // res.status(500).json(err);
-  res
-    .status(500)
-    .json({ message: 'Something went wrong, please try again later.' });
+  res.status(500).json(err);
+  // res
+  //   .status(500)
+  //   .json({ message: 'Something went wrong, please try again later.' });
 };
