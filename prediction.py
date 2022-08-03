@@ -160,7 +160,7 @@ x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size = 0.2, rando
 # custom gradient boost
 class GradientBoost:
     
-    def __init__(self, learning_rate=0.1, n_estimators=200, max_depth=3,min_samples_split=20):
+    def __init__(self, learning_rate=0.1, n_estimators=100, max_depth=3,min_samples_split=15):
         self.learning_rate = learning_rate
         self.n_estimators = n_estimators
         self.max_depth = max_depth
@@ -174,7 +174,7 @@ class GradientBoost:
         Fm = self.F0
         
         for _ in range(self.n_estimators):
-            # residual/error with respect to the previous prediction
+            # residual/error of current iteration
             r = y - Fm
             
             # train regression tree
@@ -204,7 +204,7 @@ class GradientBoost:
 
 
 # gradient boost with default hyper params
-custom_gbm = GradientBoost(n_estimators=500, learning_rate=0.1, max_depth=3, min_samples_split=15)
+custom_gbm = GradientBoost(n_estimators=100, learning_rate=0.1, max_depth=3, min_samples_split=15)
 
 
 # ## Fitting the dataset
