@@ -217,11 +217,10 @@ custom_gbm.fit(x_train, y_train)
 
 # In[274]:
 
+from sklearn.metrics import r2_score
+score = r2_score(y_test, custom_gbm.predict(x_test))
 
-train_rmse = mean_squared_error(y_train, 
-custom_gbm.predict(x_train), squared=False)
-
-error = round(train_rmse, 3)
+error = round(score, 3)
 # # Predict sale from new data
 
 # In[275]:
