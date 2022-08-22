@@ -4,7 +4,7 @@ import fs from 'fs';
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, './datas');
+    cb(null, './algo');
   },
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname);
@@ -29,7 +29,7 @@ const upload = multer({
 });
 
 export const deleteFile = (name) =>
-  fs.unlink(`./datas/${name}`, (err) => {
+  fs.unlink(`./algo/${name}`, (err) => {
     if (err) throw err.message;
   });
 

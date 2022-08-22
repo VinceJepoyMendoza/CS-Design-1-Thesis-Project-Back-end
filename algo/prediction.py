@@ -4,7 +4,7 @@ import json
 #!/usr/bin/env python
 # coding: utf-8
 
-curr_file = 'datas/' + sys.argv[1]
+curr_file = 'algo/' + sys.argv[1]
 product_name = sys.argv[2].lower()
 new_price = sys.argv[3]
 new_date = sys.argv[4]

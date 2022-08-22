@@ -4,7 +4,7 @@ import fs from 'fs';
 export default (err, req, res, next) => {
   // Delete file
   if (req.file) {
-    fs.unlink(`./datas/${req.file.filename}`, (err) => {
+    fs.unlink(`./algo/${req.file.filename}`, (err) => {
       if (err) throw err.message;
     });
   }

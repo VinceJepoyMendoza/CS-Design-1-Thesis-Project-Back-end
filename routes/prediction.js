@@ -21,6 +21,7 @@ router.post('/create', upload.single('data'), async (req, res) => {
   const fileName = req.file.filename;
 
   const options = {
+    scriptPath: 'algo',
     args: [fileName, productName, price, date, location, quantity],
   };
 
