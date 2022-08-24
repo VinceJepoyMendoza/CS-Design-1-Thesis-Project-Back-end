@@ -126,7 +126,7 @@ df['Order_Date'] = df['Order_Date'].dt.days.astype('int16')
 # In[265]:
 
 
-#Extracting vars for splitting
+#Extracting vars
 
 # dependent vars
 Y = df['Sale']
@@ -134,6 +134,13 @@ Y = df['Sale']
 df = df.drop(['Sale'], axis=1)
 
 # independent vars
+independents = ['Order_Date', 'Location', 'Quantity', 'Price']
+
+# remove non independent vars
+for col in df.columns:
+    if col not in independents:
+        df = df.drop([col], axis=1)
+
 X = df
 
 # In[268]:
@@ -141,15 +148,7 @@ X = df
 
 # ML related modules
 from sklearn.tree import DecisionTreeRegressor
-from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
-
-
-# In[269]:
-
-
-# Splitting data for training and test
-x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size = 0.2, random_state=42)
 
 
 # # Gradient Boosting for Regressor
@@ -169,31 +168,34 @@ class GradientBoost:
   
     def fit(self, X, y):
         
-        # constant value - mean of sale
+        # F of 0 - initial prediction
         self.F0 = y.mean()
+
+        # F of m - current prediction
         Fm = self.F0
         
         for _ in range(self.n_estimators):
-            # residual/error of current iteration
+            # pseudo residual with respect to the previous prediction
             r = y - Fm
             
             # train regression tree
             tree = DecisionTreeRegressor(max_depth=self.max_depth, random_state=0, min_samples_split=self.min_samples_split)
             tree.fit(X, r)
             
-            # predict new value of current iteration
+            # new prediction of current iteration
             gamma = tree.predict(X)
             
             # compute and update new residual
             Fm += self.learning_rate * gamma
             
-            # store trained tree 
+            # store tree 
             self.trees.append(tree)
             
     def predict(self, X):
         
         Fm = self.F0
         
+        # traverse all the tree and gradually decreasing residual
         for i in range(self.n_estimators):
             Fm += self.learning_rate * self.trees[i].predict(X)
             
@@ -207,20 +209,19 @@ class GradientBoost:
 custom_gbm = GradientBoost(n_estimators=100, learning_rate=0.1, max_depth=3, min_samples_split=15)
 
 
-# ## Fitting the dataset
-
 # In[272]:
 
 
-custom_gbm.fit(x_train, y_train)
+custom_gbm.fit(X, Y)
 
 
 # In[274]:
 
-from sklearn.metrics import r2_score
-score = r2_score(y_test, custom_gbm.predict(x_test))
+# getting error
 
-error = round(score, 3)
+test_rmse = mean_squared_error(Y, custom_gbm.predict(X), squared=False)
+
+error = round(test_rmse, 3)
 # # Predict sale from new data
 
 # In[275]:
@@ -233,8 +234,6 @@ conv_date = pd.to_datetime(new_date, format='%Y-%m-%d')
 
 # converting date to number of days since epoch
 new_date = (conv_date - pd.to_datetime('1970-01-01')).days
-
-new_date
 
 
 # In[276]:
